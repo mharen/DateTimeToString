@@ -12,12 +12,19 @@
 <div id="view">
     <h2 class="bindto-currentDateTime"></h2>
     <section class="bindto-lists">
-        <h2>Dates</h2>
-        <ul data-bind_key="dates.year">
-            <li data-bind_each>
-                <span data-bind_key="value"></span>
-            </li>
-        </ul>
+        <div data-bind_each>
+            <h2 data-bind_key="name"></h2>
+            <div class="sublists" data-bind_key="sublists">
+                <ul data-bind_each>
+                    <li><span data-bind_key="name"></span></li>
+                    <li>
+                        <ul data-bind_key="pairs">
+                            <li data-bind_each><span data-bind_key="value"></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </section>
 </div>
 
@@ -33,36 +40,50 @@
 
         var model = {
             currentDateTime: (new Date()).getTime(),
-            lists: {
-                dates: {
-                    year: [
+            lists: [{
+                name: "dates",
+                sublists: [{
+                    name: "year",
+                    pairs: [
                         { formatString: "yyyy", value: "2013" },
                         { formatString: "yy", value: "13" }
-                    ],
-                    month: [
+                    ]
+                }, {
+                    name: "month",
+                    pairs: [
                         { formatString: "MM", value: "09" },
                         { formatString: "M", value: "9" }
-                    ],
-                    day: [
+                    ]
+                }, {
+                    name: "day",
+                    pairs: [
                         { formatString: "ddd", value: "Wed" },
                         { formatString: "dd", value: "18" },
                         { formatString: "d", value: "18" }
                     ]
-                },
-                times: {
-                    hour: [
+                }]
+            }, {
+                name: "times",
+                sublists: [{
+                    name: "hour",
+                    pairs: [
                         { formatString: "HH", value: "10" },
                         { formatString: "hh", value: "10" }
-                    ],
-                    minute: [
+                    ]
+                }, {
+                    name: "minute",
+                    pairs: [
                         { formatString: "mm", value: "21" }
-                    ],
-                    second: [
+                    ]
+                }, {
+                    name: "second",
+                    pairs: [
                         { formatString: "ss", value: "17" }
                     ]
-                }
-            }
+                }]
+            }]
         };
+
         var d = new Iugo(model);
 
         setInterval(function () { d = new Iugo({ currentDateTime: (new Date()).getTime() }); }, 1000);
