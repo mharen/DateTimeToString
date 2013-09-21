@@ -1,0 +1,70 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+@section Style
+{
+    <style>
+        #lists > div {
+            float: left;
+        }
+    </style>
+}
+<div id="view">
+    <h2 class="bindto-currentDateTime"></h2>
+    <section class="bindto-lists">
+        <h2>Dates</h2>
+        <ul data-bind_key="dates.year">
+            <li data-bind_each>
+                <span data-bind_key="value"></span>
+            </li>
+        </ul>
+    </section>
+</div>
+
+@section Script
+{
+    <script>
+
+        //var url = "api/data";
+        //microAjax(url, function(res) {
+        //    console.log(res);
+        //    var data = JSON.parse(res);
+        //});
+
+        var model = {
+            currentDateTime: (new Date()).getTime(),
+            lists: {
+                dates: {
+                    year: [
+                        { formatString: "yyyy", value: "2013" },
+                        { formatString: "yy", value: "13" }
+                    ],
+                    month: [
+                        { formatString: "MM", value: "09" },
+                        { formatString: "M", value: "9" }
+                    ],
+                    day: [
+                        { formatString: "ddd", value: "Wed" },
+                        { formatString: "dd", value: "18" },
+                        { formatString: "d", value: "18" }
+                    ]
+                },
+                times: {
+                    hour: [
+                        { formatString: "HH", value: "10" },
+                        { formatString: "hh", value: "10" }
+                    ],
+                    minute: [
+                        { formatString: "mm", value: "21" }
+                    ],
+                    second: [
+                        { formatString: "ss", value: "17" }
+                    ]
+                }
+            }
+        };
+        var d = new Iugo(model);
+
+        setInterval(function () { d = new Iugo({ currentDateTime: (new Date()).getTime() }); }, 1000);
+    </script>
+}
