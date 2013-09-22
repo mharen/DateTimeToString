@@ -133,14 +133,16 @@
                 }]
         };
 
-        var url = "api/data";
-        microAjax(url, function(res) {
-            console.log(res);
-            model = JSON.parse(res);
-            var d = new Iugo(model);
-        });
-        
+        var refreshData = function() {
+            var url = "api/data";
+            microAjax(url, function (res) {
+                new Iugo(JSON.parse(res));
+            });
+        };
 
-        //setInterval(function () { d = new Iugo({ currentDateTime: (new Date()).getTime() }); }, 1000);
+        refreshData();
+        var refresher = setInterval(function() {
+            refreshData();
+        }, 1000);
     </script>
 }
