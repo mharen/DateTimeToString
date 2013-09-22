@@ -15,25 +15,5 @@ namespace Web.Controllers
 
             return model;
         }
-
-        private IEnumerable<string> GetDateString()
-        {
-            return new[]
-                       {
-                           "yyyy", "yy",
-                           "MM", "M",
-                           "ddd", "dd", "d"
-                       };
-        }
-        
-        private IEnumerable<string> GetTimeStrings()
-        {
-            return new[]
-                       {
-                           "HH", "hh",
-                           "mm",
-                           "ss"
-                       };
-        }
     }
 }
