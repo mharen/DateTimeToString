@@ -17,7 +17,7 @@ namespace Web.Models
 
             Lists.Add(new List
                           {
-                              Name = "standard strings",
+                              Name = "shorthand/standard strings",
                               Sublists =
                                   new List<Sublist>
                                       {
@@ -75,7 +75,7 @@ namespace Web.Models
                                         Name= "month",
                                         Pairs = new List<Pair>{
                                             new Pair(when, "MM"),
-                                            new Pair(when, "M")
+                                            new Pair(when, "%M")
                                         }
                                     },
                                     new Sublist{
@@ -83,7 +83,7 @@ namespace Web.Models
                                         Pairs = new List<Pair>{
                                             new Pair(when, "ddd"),
                                             new Pair(when, "dd"),
-                                            new Pair(when, "d")
+                                            new Pair(when, "%d")
                                         }
                                     }
                                 }
