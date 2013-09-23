@@ -4,22 +4,43 @@
 @section Style
 {
     <style>
+        .list-name,
+        .sublist-name {
+            font-family: "Roboto","HelveticaNeueUltraLight","HelveticaNeue-Ultra-Light","Helvetica Neue Ultra Light","HelveticaNeue","Helvetica Neue",'TeXGyreHerosRegular',"Arial",sans-serif;
+            font-weight: 100;
+            font-stretch: normal;
+            text-shadow: 0 0 1px rgba(0,0,0,.3);
+        }
+
         ul, li {
             margin: 0;
             list-style-type: none;
         }
 
-        .list, .sublist, .pairs {
+        .list {
+            float: left;
+            padding: 10px;
+        }
+
+        .sublist, .pairs {
             margin-left: 5px;
             padding-left: 5px;
             /*border-left: 2px solid #999;*/
         }
 
-            .list + .list, .sublist + .sublist {
+            .sublist + .sublist {
                 padding-top: 10px;
             }
 
-        .sublist {
+        .list-name {
+            font-size: 150%;
+        }
+
+        .sublist-name {
+            font-size: 125%;
+        }
+
+        .pairs {
             font-family: Consolas, Courier New, monospace;
         }
 
@@ -32,7 +53,6 @@
     </style>
 }
 <div id="view">
-    <h2 class="bindto-currentDateTime"></h2>
     <section class="lists bindto-lists">
         <div class="list" data-bind_each>
             <div class="list-name" data-bind_key="name"></div>
@@ -133,16 +153,42 @@
                 }]
         };
 
-        var refreshData = function() {
+        var refreshData = function () {
             var url = "api/data";
             microAjax(url, function (res) {
                 new Iugo(JSON.parse(res));
             });
         };
 
+        var refresher;
+        var startAutoRefresh = function () {
+            refresher = setInterval(function () {
+                refreshData();
+            }, 1000);
+        };
         refreshData();
-        var refresher = setInterval(function() {
-            refreshData();
-        }, 1000);
+        startAutoRefresh();
+
+        function getSelectedText() {
+            var text = "";
+            if (typeof window.getSelection != "undefined") {
+                text = window.getSelection().toString();
+            } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+                text = document.selection.createRange().text;
+            }
+            return text;
+        }
+
+        // don't refresh the page if the user is interacting with it, e.g. copying something
+        document.onmousedown = function () {
+            clearInterval(refresher);
+        };
+
+        document.onmouseup = function () {
+            if (!getSelectedText()) {
+                // nothing selected...restart the refresher
+                startAutoRefresh();
+            }
+        };
     </script>
 }
