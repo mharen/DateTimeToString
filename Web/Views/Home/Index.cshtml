@@ -1,4 +1,6 @@
-﻿@{
+﻿@using System.Globalization
+@model Web.Models.IndexModel
+@{
     ViewBag.Title = "Index";
 }
 @section Style
@@ -53,6 +55,12 @@
         td,th{ vertical-align: top;}
     </style>
 }
+<div id="search">
+    <form>
+        <label>Culture @Html.DropDownListFor(m => m.SelectedCultureId, Model.Cultures)</label>
+        <input type="submit" value="Refresh" />
+    </form>
+</div>
 <div id="view">
     <section class="lists bindto-lists">
         <div class="list" data-bind_each>
@@ -77,93 +85,17 @@
 @section Script
 {
     <script>
-        var model = {
-            now: (new Date()).getTime(),
-            lists: [
-                {
-                    name: "standard strings",
-                    sublists: [{
-                        name: "dates",
-                        pairs: [
-                            { formatString: "d", value: "9/21/2013" },
-                            { formatString: "D", value: "Saturday, September 21, 2013" },
-                            { formatString: "m", value: "September 21" },
-                            { formatString: "y", value: "September, 2013" }
-                        ]
-                    }, {
-                        name: "times",
-                        pairs: [
-                            { formatString: "t", value: "9:15 PM" },
-                            { formatString: "T", value: "9:15:07 PM" }
-                        ]
-                    }, {
-                        name: "combos",
-                        pairs: [
-                            { formatString: "f", value: "Saturday, September 21, 2013 9:15 PM" },
-                            { formatString: "F", value: "Saturday, September 21, 2013 9:15:07 PM" },
-                            { formatString: "g", value: "9/21/2013 9:15 PM" },
-                            { formatString: "G", value: "9/21/2013 9:15:07 PM" },
-                            { formatString: "o", value: "2013-09-21T21:15:07.0000000" },
-                            { formatString: "R", value: "Sat, 21 Sep 2013 21:15:07 GMT" },
-                            { formatString: "s", value: "2013-09-21T21:15:07" },
-                            { formatString: "u", value: "2013-09-21 21:15:07Z" },
-                            { formatString: "U", value: "Saturday, September 21, 2013 9:15 PM" }
-                        ]
-                    }]
-                }, {
-                    name: "custom dates bits",
-                    sublists: [{
-                        name: "year",
-                        pairs: [
-                            { formatString: "yyyy", value: "2013" },
-                            { formatString: "yy", value: "13" }
-                        ]
-                    }, {
-                        name: "month",
-                        pairs: [
-                            { formatString: "MM", value: "09" },
-                            { formatString: "M", value: "9" }
-                        ]
-                    }, {
-                        name: "day",
-                        pairs: [
-                            { formatString: "ddd", value: "Wed" },
-                            { formatString: "dd", value: "18" },
-                            { formatString: "d", value: "18" }
-                        ]
-                    }]
-                }, {
-                    name: "custom time bits",
-                    sublists: [{
-                        name: "hour",
-                        pairs: [
-                            { formatString: "HH", value: "10" },
-                            { formatString: "hh", value: "10" }
-                        ]
-                    }, {
-                        name: "minute",
-                        pairs: [
-                            { formatString: "mm", value: "21" }
-                        ]
-                    }, {
-                        name: "second",
-                        pairs: [
-                            { formatString: "ss", value: "17" }
-                        ]
-                    }]
-                }]
-        };
-
         var refreshData = function () {
-            var url = "api/data";
-            microAjax(url, function (res) {
-                new Iugo(JSON.parse(res));
+            var view = document.getElementById('view');
+            var url = "api/data" + location.search;
+            microAjax(url, function(res) {
+                new Iugo(JSON.parse(res), view);
             });
         };
 
         var refresher;
-        var startAutoRefresh = function () {
-            refresher = setInterval(function () {
+        var startAutoRefresh = function() {
+            refresher = setInterval(function() {
                 refreshData();
             }, 1000);
         };
@@ -181,11 +113,11 @@
         }
 
         // don't refresh the page if the user is interacting with it, e.g. copying something
-        document.onmousedown = function () {
+        document.onmousedown = function() {
             clearInterval(refresher);
         };
 
-        document.onmouseup = function () {
+        document.onmouseup = function() {
             if (!getSelectedText()) {
                 // nothing selected...restart the refresher
                 startAutoRefresh();
