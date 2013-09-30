@@ -8,10 +8,10 @@
     <style>
         .list-name,
         .sublist-name {
-            font-family: "Roboto","HelveticaNeueUltraLight","HelveticaNeue-Ultra-Light","Helvetica Neue Ultra Light","HelveticaNeue","Helvetica Neue",'TeXGyreHerosRegular',"Arial",sans-serif;
+            font-family: "Roboto", "HelveticaNeueUltraLight", "HelveticaNeue-Ultra-Light", "Helvetica Neue Ultra Light", "HelveticaNeue", "Helvetica Neue", 'TeXGyreHerosRegular', "Arial", sans-serif;
             font-weight: 100;
             font-stretch: normal;
-            text-shadow: 0 0 1px rgba(0,0,0,.3);
+            text-shadow: 0 0 1px rgba(0, 0, 0, .3);
         }
 
         ul, li {
@@ -30,9 +30,9 @@
             /*border-left: 2px solid #999;*/
         }
 
-            .sublist + .sublist {
-                padding-top: 10px;
-            }
+        .sublist + .sublist {
+            padding-top: 10px;
+        }
 
         .list-name {
             font-size: 150%;
@@ -52,15 +52,41 @@
         .pair-format-string {
             padding-right: 10px;
         }
-        td,th{ vertical-align: top;}
-        form label{ display:block}
-    </style>
+
+        td, th {
+            vertical-align: top;
+        }
+
+        form label {
+            padding-top: 5px;
+            display: block;
+            font-size: 80%;
+        }
+        form div.input {
+            float: left;
+            margin-right: 10px;
+        }
+        #view { clear: both; }
+
+        @@media only screen and (max-width : 480px) {
+            form select{ width: 100%;}
+        }
+        </style>
 }
 <div id="search">
     <form>
-        <label>Culture @Html.DropDownListFor(m => m.SelectedCultureId, Model.Cultures)</label>
-        <label>Time Zone @Html.DropDownListFor(m => m.SelectedTimeZoneId, Model.TimeZones)</label>
-        <input type="submit" value="Refresh" />
+        <div class="input">
+            @Html.LabelFor(m => m.SelectedCultureId, "Culture")
+            <div>@Html.DropDownListFor(m => m.SelectedCultureId, Model.Cultures)</div>
+        </div>
+        <div class="input">
+            @Html.LabelFor(m => m.SelectedTimeZoneId, "Time Zone")
+            <div>@Html.DropDownListFor(m => m.SelectedTimeZoneId, Model.TimeZones)</div>
+        </div>
+        <div class="input">
+            <label>&nbsp;<!-- spacer --></label>
+            <input type="submit" value="Refresh" />
+        </div>
     </form>
 </div>
 <div id="view">
@@ -90,14 +116,14 @@
         var refreshData = function () {
             var view = document.getElementById('view');
             var url = "api/data" + location.search;
-            microAjax(url, function(res) {
+            microAjax(url, function (res) {
                 new Iugo(JSON.parse(res), view);
             });
         };
 
         var refresher;
-        var startAutoRefresh = function() {
-            refresher = setInterval(function() {
+        var startAutoRefresh = function () {
+            refresher = setInterval(function () {
                 refreshData();
             }, 1000);
         };
@@ -115,11 +141,11 @@
         }
 
         // don't refresh the page if the user is interacting with it, e.g. copying something
-        document.onmousedown = function() {
+        document.onmousedown = function () {
             clearInterval(refresher);
         };
 
-        document.onmouseup = function() {
+        document.onmouseup = function () {
             if (!getSelectedText()) {
                 // nothing selected...restart the refresher
                 startAutoRefresh();
