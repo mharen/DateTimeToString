@@ -11,20 +11,24 @@ namespace Web.Controllers
     {
         public ActionResult Index(IndexModel model)
         {
-            var cultures = CultureInfo.GetCultures(CultureTypes.AllCultures)
-                                      .Select(c => new SelectListItem
-                                                       {
-                                                           Text = c.DisplayName,
-                                                           Value = c.LCID.ToString(CultureInfo.InvariantCulture)
-                                                       })
-                                      .OrderBy(c => c.Text);
+            model.Cultures = CultureInfo.GetCultures(CultureTypes.AllCultures)
+                                        .OrderBy(c => c.DisplayName)
+                                        .Select(c => new SelectListItem
+                                                         {
+                                                             Text = c.DisplayName,
+                                                             Value = c.LCID.ToString(CultureInfo.InvariantCulture)
+                                                         })
+                                        .ToList();
 
-            model.Cultures = cultures.ToList();
+            model.TimeZones = TimeZoneInfo.GetSystemTimeZones()
+                                          .OrderBy(tz => tz.BaseUtcOffset)
+                                          .Select(tz => new SelectListItem
+                                                            {
+                                                                Text = tz.DisplayName,
+                                                                Value = tz.Id
+                                                            })
+                                          .ToList();
 
-            if (model.SelectedCultureId == 0)
-            {
-                model.SelectedCultureId = 1033; // en-us
-            }
             return View(model);
         }
     }

@@ -53,11 +53,13 @@
             padding-right: 10px;
         }
         td,th{ vertical-align: top;}
+        form label{ display:block}
     </style>
 }
 <div id="search">
     <form>
         <label>Culture @Html.DropDownListFor(m => m.SelectedCultureId, Model.Cultures)</label>
+        <label>Time Zone @Html.DropDownListFor(m => m.SelectedTimeZoneId, Model.TimeZones)</label>
         <input type="submit" value="Refresh" />
     </form>
 </div>

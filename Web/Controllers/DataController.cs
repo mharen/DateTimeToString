@@ -9,13 +9,14 @@ namespace Web.Controllers
 {
     public class DataController : ApiController
     {
-        public OutputModel Get(int selectedCultureId = 1033 /* en-us */)
+        public OutputModel Get([FromUri] IndexModel indexModel)
         {
-            var culture = CultureInfo.GetCultureInfo(selectedCultureId);
+            var culture = CultureInfo.GetCultureInfo(indexModel.SelectedCultureId);
             System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 
             var when = DateTime.UtcNow;
-            var model = new OutputModel(when);
+            var whenInZone = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(when, indexModel.SelectedTimeZoneId);
+            var model = new OutputModel(whenInZone);
 
             return model;
         }
