@@ -46,9 +46,6 @@
             font-family: Consolas, Courier New, monospace;
         }
 
-        .pairs {
-        }
-
         .pair-format-string {
             padding-right: 10px;
         }
@@ -68,6 +65,7 @@
         }
         #view { clear: both; }
 
+        a { color: #0645ad;text-decoration: none;}
         @@media only screen and (max-width : 480px) {
             form select{ width: 100%;}
         }
@@ -99,7 +97,7 @@
                     <table class="pairs">
                         <tbody data-bind_key="pairs">
                             <tr class="pair" data-bind_each>
-                                <td class="pair-format-string" data-bind_key="formatString"></td>
+                                <td class="pair-format-string"><a href="${referenceUrl}">${formatString}</a></td>
                                 <td class="pair-value" data-bind_key="value"></td>
                             </tr>
                         </tbody>
