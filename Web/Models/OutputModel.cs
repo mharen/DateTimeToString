@@ -18,7 +18,7 @@ namespace Web.Models
 
             Lists.Add(new List
                           {
-                              Name = "shorthand/standard strings",
+                              Name = "shorthand format strings",
                               Sublists =
                                   new List<Sublist>
                                       {
