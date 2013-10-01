@@ -11,6 +11,8 @@ namespace Web.Controllers
     {
         public OutputModel Get([FromUri] IndexModel indexModel)
         {
+            Utilities.LoadUserDefaultCultureWhereNecessary(indexModel, Request.Headers.AcceptLanguage.Select(h=>h.Value).FirstOrDefault());
+
             var culture = CultureInfo.GetCultureInfo(indexModel.SelectedCultureId);
             System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 

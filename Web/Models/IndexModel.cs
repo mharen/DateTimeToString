@@ -11,7 +11,7 @@ namespace Web.Models
         public IndexModel()
         {
             // defaults
-            SelectedCultureId = 1033; // en-US
+            // SelectedCultureId = 1033; // en-US
             SelectedTimeZoneId = "UTC";
         }
 

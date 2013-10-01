@@ -29,7 +29,10 @@ namespace Web.Controllers
                                                             })
                                           .ToList();
 
+            Utilities.LoadUserDefaultCultureWhereNecessary(model, Request.UserLanguages.FirstOrDefault());
             return View(model);
         }
+
+
     }
 }
