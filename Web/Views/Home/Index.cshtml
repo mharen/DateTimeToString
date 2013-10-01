@@ -90,14 +90,14 @@
 <div id="view">
     <section class="lists bindto-lists">
         <div class="list" data-bind_each>
-            <div class="list-name" data-bind_key="name">custom and standard datetime format strings</div>
+            <div class="list-name" data-bind_key="name">custom and standard datetime format strings now loading...</div>
             <div class="sublists" data-bind_key="sublists">
                 <ul class="sublist" data-bind_each>
                     <li class="sublist-name" data-bind_key="name"></li>
                     <table class="pairs">
                         <tbody data-bind_key="pairs">
                             <tr class="pair" data-bind_each>
-                                <td class="pair-format-string"><a href="${referenceUrl}">${formatString}</a></td>
+                                <td class="pair-format-string"><a href="${referenceUrl}" data-bind_key="formatString"></a></td>
                                 <td class="pair-value" data-bind_key="value"></td>
                             </tr>
                         </tbody>
