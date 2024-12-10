@@ -1,4 +1,4 @@
 DateTimeToString
 ================
 
-https://datetimetostring.azurewebsites.net
+https://datetimetostring.wassupy.com

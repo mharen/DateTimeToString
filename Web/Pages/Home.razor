@@ -1,0 +1,214 @@
+﻿@page "/"
+@implements IDisposable
+@inject IJSRuntime JS
+
+<h1>DateTime.ToString()</h1>
+
+<label for="culture">Culture</label>
+<select id="culture" @bind="SelectedCultureName">
+@foreach(var item in Cultures){
+    <option value="@item.Name" selected=@(SelectedCultureName == item.Name)>@item.Name</option>
+}
+</select>
+
+@if(SelectedTimeZoneId is not null){
+    <label for="timezone">Time zone</label>
+    <select id="timezone" @bind="SelectedTimeZoneId">
+    @foreach(var item in TimeZones){
+        <option value="@item.Value" selected=@(SelectedTimeZoneId == item.Value)>@item.Key</option>
+    }
+    </select>
+}
+
+@{
+    var culture = new CultureInfo(SelectedCultureName);
+
+    if(When == DateTime.MinValue)
+        return;
+}
+
+<article>
+    <section>
+        <h2>shorthand format strings</h2>
+
+        <h3>dates</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#ShortDate">d</a></th><td>@When.ToString("d", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#LongDate">D</a></th><td>@When.ToString("D", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#MonthDay">m</a></th><td>@When.ToString("m", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#MonthDay">M</a></th><td>@When.ToString("M", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#YearMonth">y</a></th><td>@When.ToString("y", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#YearMonth">Y</a></th><td>@When.ToString("Y", culture)</td></tr>
+        </table>
+
+        <h3>times</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#ShortTime">t</a></th><td>@When.ToString("t", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#LongTime">T</a></th><td>@When.ToString("T", culture)</td></tr>
+        </table>
+
+        <h3>combos</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#FullDateShortTime">f</a></th><td>@When.ToString("f", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#FullDateLongTime">F</a></th><td>@When.ToString("F", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#GeneralDateShortTime">g</a></th><td>@When.ToString("g", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#GeneralDateLongTime">G</a></th><td>@When.ToString("G", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Roundtrip">o</a></th><td>@When.ToString("o", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Roundtrip">O</a></th><td>@When.ToString("O", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#RFC1123">r</a></th><td>@When.ToString("r", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#RFC1123">R</a></th><td>@When.ToString("R", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Sortable">s</a></th><td>@When.ToString("s", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#UniversalSortable">u</a></th><td>@When.ToString("u", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#UniversalFull">U</a></th><td>@When.ToString("U", culture)</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>custom date bits</h2>
+
+        <h3>era</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#gSpecifier">%g</a></th><td>@When.ToString("%g", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ggSpecifier">gg</a></th><td>@When.ToString("gg", culture)</td></tr>
+        </table>
+
+        <h3>year</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#yyyyySpecifier">yyyyy</a></th><td>@When.ToString("yyyyy", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#yyyySpecifier">yyyy</a></th><td>@When.ToString("yyyy", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#yyySpecifier">yyyy</a></th><td>@When.ToString("yyyy", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#yySpecifier">yy</a></th><td>@When.ToString("yy", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ySpecifier">y</a></th><td>@When.ToString("y", culture)</td></tr>
+        </table>
+
+        <h3>month</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#MMMM_Specifier">MMMM</a></th><td>@When.ToString("MMMM", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#MMM_Specifier">MMM</a></th><td>@When.ToString("MMM", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#MM_Specifier">MM</a></th><td>@When.ToString("MM", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#M_Specifier">%M</a></th><td>@When.ToString("%M", culture)</td></tr>
+        </table>
+
+        <h3>day</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ddddSpecifier">dddd</a></th><td>@When.ToString("dddd", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#dddSpecifier">ddd</a></th><td>@When.ToString("ddd", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ddSpecifier">dd</a></th><td>@When.ToString("dd", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#dSpecifier">%d</a></th><td>@When.ToString("%d", culture)</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>custom time bits</h2>
+
+        <h3>hour</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#HH_Specifier">HH</a></th><td>@When.ToString("HH", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#H_Specifier">%H</a></th><td>@When.ToString("%H", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#hhSpecifier">hh</a></th><td>@When.ToString("hh", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#hSpecifier">%h</a></th><td>@When.ToString("%h", culture)</td></tr>
+        </table>
+
+        <h3>minute</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#mmSpecifier">mm</a></th><td>@When.ToString("mm", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#mSpecifier">%m</a></th><td>@When.ToString("%m", culture)</td></tr>
+        </table>
+
+        <h3>second</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ssSpecifier">ss</a></th><td>@When.ToString("ss", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#sSpecifier">%s</a></th><td>@When.ToString("%s", culture)</td></tr>
+        </table>
+
+        <h3>subsecond</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fSpecifier">%f</a></th><td>@When.ToString("%f", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ffSpecifier">ff</a></th><td>@When.ToString("ff", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fffSpecifier">fff</a></th><td>@When.ToString("fff", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ffffSpecifier">ffff</a></th><td>@When.ToString("ffff",culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fffffSpecifier">fffff</a></th><td>@When.ToString("fffff", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ffffffSpecifier">ffffff</a></th><td>@When.ToString("ffffff", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fffffffSpecifier">fffffff</a></th><td>@When.ToString("fffffff",culture)</td></tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>miscellaneous bits</h2>
+
+        <h3>date separator</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#dateSeparator">%/</a></th><td>@When.ToString("%/", culture)</td></tr>
+        </table>
+
+        <h3>time separator</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#timeSeparator">%:</a></th><td>@When.ToString("%:", culture)</td></tr>
+        </table>
+
+        <h3>AM/PM</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#tSpecifier">%t</a></th><td>@When.ToString("%t", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ttSpecifier">tt</a></th><td>@When.ToString("tt", culture)</td></tr>
+        </table>
+
+        <h3>time zone</h3>
+        <table>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#KSpecifier">%K</a></th><td>@When.ToString("%K", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#zSpecifier">%z</a></th><td>@When.ToString("%z", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#zzSpecifier">zz</a></th><td>@When.ToString("zz", culture)</td></tr>
+            <tr><th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#zzzSpecifier">zzz</a></th><td>@When.ToString("zzz", culture)</td></tr>
+        </table>
+    </section>
+</article>
+
+<footer>
+    <a href="https://www.wassupy.com">wassupy.com</a>
+</footer>
+
+@code {
+    string SelectedCultureName = "en-US";
+    string? DetectedLocale;
+    
+    const string DefaultTimeZoneId = "America/New_York";
+    string? SelectedTimeZoneId;
+    string? DetectedTimeZoneId;
+
+    DateTime When = DateTime.MinValue;
+
+    public IList<CultureInfo> Cultures = CultureInfo.GetCultures(CultureTypes.AllCultures).OrderBy(c => c.Name).ToList();
+
+    public IList<KeyValuePair<string,string>> TimeZones = TimeZoneInfo.GetSystemTimeZones()
+                                          .OrderBy(tz => tz.BaseUtcOffset)
+                                          .Select(tz => new KeyValuePair<string,string>(tz.DisplayName, tz.Id))
+                                          .ToList();
+
+    System.Threading.Timer? timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        DetectedTimeZoneId = (await JS.InvokeAsync<string>("getBrowserTimeZone"));
+        if(TimeZones.Any(tz => tz.Value == DetectedTimeZoneId))
+            SelectedTimeZoneId = DetectedTimeZoneId;
+
+        DetectedLocale = (await JS.InvokeAsync<string>("getBrowserLanguage"));
+        if(Cultures.Any(c => c.Name == DetectedLocale))
+            SelectedCultureName = DetectedLocale;
+
+        timer = new System.Threading.Timer(_ =>
+        {
+            string desiredTzId = SelectedTimeZoneId ?? DetectedTimeZoneId ?? DefaultTimeZoneId;
+            if(!TimeZoneInfo.TryFindSystemTimeZoneById(desiredTzId, out TimeZoneInfo? tz))
+                tz = TimeZoneInfo.FindSystemTimeZoneById(DefaultTimeZoneId);
+
+            When = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+
+            StateHasChanged();
+        }, null, 0, 200);
+    }
+    
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}
