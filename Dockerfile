@@ -11,7 +11,7 @@ WORKDIR /App/Web
 RUN dotnet publish -c Release -o /out
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-chiseled-extra
 ENV DOTNET_URLS=http://*:80
 WORKDIR /var/www/web
 COPY --from=build-env /out .
