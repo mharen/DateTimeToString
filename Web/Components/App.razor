@@ -32,6 +32,7 @@
     <script>
         window.getBrowserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
         window.getBrowserLanguage = () => navigator.language;
+        window.jump = (target) => window.location.hash = target;
     </script>
 </head>
 

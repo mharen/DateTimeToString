@@ -19,3 +19,9 @@ public class HttpTimeZoneProvider : ITimeZoneProvider
         return ValueTask.FromResult((string?)null);
     }
 }
+
+public class HttpNavigationProvider : INavigationProvider
+{
+    // noop
+    public ValueTask Jump(string target) => ValueTask.CompletedTask;
+}

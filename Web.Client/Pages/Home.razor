@@ -4,6 +4,7 @@
 @inject IJSRuntime JS
 @inject ILanguageProvider LanguageProvider
 @inject ITimeZoneProvider TimeZoneProvider
+@inject INavigationProvider NavigationProvider
 
 <header>
     <h1>DateTime.ToString()</h1>
@@ -852,7 +853,7 @@
             </tr>
         </table>
 
-        <h3>time zone<a href="#footnote-1"><sup id="headnote-1">1</sup></a></h3>
+        <h3>time zone<a @onclick='() => NavigationProvider.Jump("footnote-1")' href="#footnote-1"><sup id="headnote-1">1</sup></a></h3>
         <table>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#KSpecifier">%K</a></th>
@@ -884,7 +885,7 @@
         <li>Use <code>DateTimeOffset</code> when possible (instead of <code>DateTime</code>)</li>
         <li>Store, load, work (and think) in UTC as much as possible</li>
         <li>Side-step time zones altogether by displaying time in relative time units when possible (e.g. "2 hours ago"
-            instead of "@WhenOffset.AddHours(-2).ToString()").</li>
+            instead of "@When.AddHours(-2).ToString()").</li>
         <li>Avoid methods like <code>ToLocalTime</code> or <code>ToUniversalTime</code> as these make assumptions and
             rely on the server's time zone, which is often not helpful. Use <code>TimeZoneInfo.ConvertTime</code> instead.</li>
     </ul>
@@ -920,7 +921,7 @@ sfLocal.ToString("o") -> @sfLocal.ToString("o").FillMicroseconds(FakeMicrosecond
     <p>The time is correct, but the time zone offset <em>is not</em>. Chicago is @tz.GetUtcOffset(dt).ToString("\\-hh\\:mm"), not
         @sfLocal.ToString("zzz"). "Local" in this context is the <em>server's</em> time zone
         (@TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).ToString("\\-hh\\:mm")).</p>
-    <p><a href="#headnote-1"><sup id="footnote-1">1</sup></a>That undesired time zone also shows up in the related format strings <code>%K</code>, <code>%z</code>,
+    <p><a @onclick='() => NavigationProvider.Jump("headnote-1")' href="#headnote-1"><sup id="footnote-1">1</sup></a>That undesired time zone also shows up in the related format strings <code>%K</code>, <code>%z</code>,
         <code>zz</code>, and <code>zzz</code> above. Again, these show the time zone of the server, not the time
         zone the value was converted to. Luckily, <code>DateTimeOffset</code> handles this better:</p>
     <pre>
@@ -988,9 +989,7 @@ DateTime unspecified = TimeZoneInfo.ConvertTime(utc, tz);
             SelectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
     }
 
-    DateTime WhenUtc;
-    DateTime When;
-    DateTimeOffset WhenOffset;
+    DateTime When = DateTime.UtcNow;
     string FakeMicroseconds = "0000";
 
     System.Threading.Timer? timer;
@@ -1002,6 +1001,7 @@ DateTime unspecified = TimeZoneInfo.ConvertTime(utc, tz);
 
         SelectedTimeZoneId = await TimeZoneProvider.DetectTimeZoneId();
         ApplySelectedTimeZone();
+
         Tick();
     }
 
@@ -1009,11 +1009,7 @@ DateTime unspecified = TimeZoneInfo.ConvertTime(utc, tz);
     {
         if (SelectedTimeZone is not null)
         {
-
-            WhenOffset = DateTimeOffset.UtcNow.ToOffset(SelectedTimeZone.BaseUtcOffset);
-
-            WhenUtc = WhenOffset.UtcDateTime;
-            When = TimeZoneInfo.ConvertTime(WhenUtc, SelectedTimeZone);
+            When = TimeZoneInfo.ConvertTime(DateTime.UtcNow, SelectedTimeZone);
 
             // when wasm renders a date, it has no precision beyond milliseconds so the tostring shows
             // all zeros. We make up our own so the output can be formatted to appear correct

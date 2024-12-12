@@ -12,6 +12,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ILanguageProvider, HttpLanguageProvider>();
 builder.Services.AddScoped<ITimeZoneProvider, HttpTimeZoneProvider>();
+builder.Services.AddScoped<INavigationProvider, HttpNavigationProvider>();
 
 var app = builder.Build();
 

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Web.Client.Services
@@ -29,5 +30,15 @@ namespace Web.Client.Services
             var tz = await js.InvokeAsync<string>("getBrowserTimeZone");
             return tz;
         }
+    }
+
+
+    public interface INavigationProvider
+    {
+        ValueTask Jump(string target);
+    }
+    public class JsNavigationProvider(IJSRuntime js) : INavigationProvider
+    {
+        public ValueTask Jump(string target) => js.InvokeVoidAsync("jump", target);
     }
 }
