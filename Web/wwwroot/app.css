@@ -4,12 +4,50 @@ html {
     font-size: 16px;
 }
 
+body {
+    margin: 0;
+    padding: 1rem;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+
+main {
+    display: flex;
+    gap: 1rem 3rem;
+    flex-wrap: wrap;
+}
+
+p:has(:target),
+h3:has(:target) {
+    background-color: #ff6;
+}
+
+footer {
+    margin-top: 3rem;
+}
+
+code,
+pre {
+    font-size: .9rem;
+}
+
+pre {
+    background-color: #eee;
+    padding: 0.5rem 1rem;
+    margin: -0.5rem -1rem;
+    /* border-radius: .25rem; */
+    overflow-y: scroll;
+}
+
 header {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
     align-items: center;
-    gap: .5rem;
+    gap: .5rem 2rem;
     margin-bottom: .5rem;
 }
 
@@ -21,26 +59,6 @@ h1 {
 h1,
 table {
     font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", "Liberation Mono", Menlo, Monaco, Consolas, monospace
-}
-
-*,
-*:before,
-*:after {
-    box-sizing: inherit;
-}
-
-main {
-    margin: .25rem;
-}
-
-article {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-footer {
-    margin-top: 3rem;
 }
 
 body,
@@ -57,13 +75,18 @@ h2 {
 }
 
 h3 {
-    margin: 1rem 0 .25rem 0;
+    margin: 1rem -.25rem .25rem -.25rem;
+    padding: 0 .25rem;
 }
 
 h2+h3 {
     margin-top: 0.5rem;
 }
 
+p{
+    margin: .5rem -1rem;
+    padding: .5rem 1rem;
+}
 table {
     margin: -0.25rem;
     border-collapse: collapse;

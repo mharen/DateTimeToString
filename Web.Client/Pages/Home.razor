@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@inherits LayoutComponentBase
+@page "/"
 @implements IDisposable
 @inject IJSRuntime JS
 @inject ILanguageProvider LanguageProvider
@@ -576,10 +577,9 @@
     </div>
 </div>
 
-<article>
+<main>
     <section>
         <h2>shorthand format strings</h2>
-
         <h3>dates</h3>
         <table>
             <tr>
@@ -640,26 +640,18 @@
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Roundtrip">o</a></th>
-                <td>@When.ToString("o")</td>
-            </tr>
-            <tr>
-                <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Roundtrip">O</a></th>
-                <td>@When.ToString("O")</td>
+                <td>@When.ToString("o").FillMicroseconds(FakeMicroseconds)</td>
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#RFC1123">r</a></th>
                 <td>@When.ToString("r")</td>
             </tr>
             <tr>
-                <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#RFC1123">R</a></th>
-                <td>@When.ToString("R")</td>
-            </tr>
-            <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Sortable">s</a></th>
                 <td>@When.ToString("s")</td>
             </tr>
             <tr>
-                <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#UniversalSortable">u</a></th>
+                <th><a href="http://msdn.microsoft.com/en-us/library/az4se3k1.aspx#Sortable">u</a></th>
                 <td>@When.ToString("u")</td>
             </tr>
             <tr>
@@ -812,19 +804,19 @@
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ffffSpecifier">ffff</a></th>
-                <td>@When.ToString("ffff")</td>
+                <td>@When.ToString("fff")@FakeMicroseconds[0]</td>
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fffffSpecifier">fffff</a></th>
-                <td>@When.ToString("fffff")</td>
+                <td>@When.ToString("fff")@FakeMicroseconds[..2]</td>
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#ffffffSpecifier">ffffff</a></th>
-                <td>@When.ToString("ffffff")</td>
+                <td>@When.ToString("fff")@FakeMicroseconds[..3]</td>
             </tr>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#fffffffSpecifier">fffffff</a></th>
-                <td>@When.ToString("fffffff")</td>
+                <td>@When.ToString("fff")@FakeMicroseconds[..4]</td>
             </tr>
         </table>
     </section>
@@ -860,7 +852,7 @@
             </tr>
         </table>
 
-        <h3>time zone</h3>
+        <h3>time zone<a href="#footnote-1"><sup id="headnote-1">1</sup></a></h3>
         <table>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#KSpecifier">%K</a></th>
@@ -880,7 +872,99 @@
             </tr>
         </table>
     </section>
+</main>
+<article>
+    <h2>Pitfalls and traps</h2>
+
+    <h3>General advice</h3>
+    <p>Dates, times, and time zones are tricky. In .NET, there are subtle differences that can be challenging to spot.
+        My general advice is:
+    </p>
+    <ul>
+        <li>Use <code>DateTimeOffset</code> when possible (instead of <code>DateTime</code>)</li>
+        <li>Store, load, work (and think) in UTC as much as possible</li>
+        <li>Side-step time zones altogether by displaying time in relative time units when possible (e.g. "2 hours ago"
+            instead of "@WhenOffset.AddHours(-2).ToString()").</li>
+        <li>Avoid methods like <code>ToLocalTime</code> or <code>ToUniversalTime</code> as these make assumptions and
+            rely on the server's time zone, which is often not helpful. Use <code>TimeZoneInfo.ConvertTime</code> instead.</li>
+    </ul>
+    <h3>Other gotchas</h3>
+    <p><code>TimeZoneInfo.ConvertTime(...)</code> returns a <code>DateTime</code> with <code>Kind = Unspecified</code>.
+        For example:</p>
+    <pre>
+@{
+    DateTime dt = DateTime.UtcNow;
+    TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
+    var sf = TimeZoneInfo.ConvertTime(dt, tz);
+}
+DateTime dt = DateTime.UtcNow;
+// dt.ToString("o") -> @dt.ToString("o").FillMicroseconds(FakeMicroseconds)
+// dt.Kind -> @dt.Kind
+
+TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("America/Chicago");
+var sf = TimeZoneInfo.ConvertTime(d, tz);
+// sf.ToString("o") -> @sf.ToString("o").FillMicroseconds(FakeMicroseconds)
+// sf.Kind -> @sf.Kind
+    </pre>
+    <p>Note that the Unspecified time lacks a time zone offset in the output. You might be tempted to set its
+        <code>Kind</code> to <code>Local</code>, but this is usually not a good idea:
+    </p>
+    <pre>
+@{
+    var sfLocal = DateTime.SpecifyKind(sf, DateTimeKind.Local);
+}
+// don't do this
+var sfLocal = DateTime.SpecifyKind(sf, DateTimeKind.Local);
+sfLocal.ToString("o") -> @sfLocal.ToString("o").FillMicroseconds(FakeMicroseconds)
+    </pre>
+    <p>The time is correct, but the time zone offset <em>is not</em>. Chicago is @tz.GetUtcOffset(dt).ToString("\\-hh\\:mm"), not
+        @sfLocal.ToString("zzz"). "Local" in this context is the <em>server's</em> time zone
+        (@TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).ToString("\\-hh\\:mm")).</p>
+    <p><a href="#headnote-1"><sup id="footnote-1">1</sup></a>That undesired time zone also shows up in the related format strings <code>%K</code>, <code>%z</code>,
+        <code>zz</code>, and <code>zzz</code> above. Again, these show the time zone of the server, not the time
+        zone the value was converted to. Luckily, <code>DateTimeOffset</code> handles this better:</p>
+    <pre>
+@{
+    var dto = DateTimeOffset.UtcNow;
+    var chicagoDto = TimeZoneInfo.ConvertTime(dto, tz);
+}
+var dto = DateTimeOffset.UtcNow;
+var chicagoDto = TimeZoneInfo.ConvertTime(dto, tz);
+// dto.ToString("zzz")        --> @dto.ToString("zzz")
+// chicagoDto.ToString("zzz") --> @chicagoDto.ToString("zzz")
+    </pre>
+
+    <h3>Other surprising things</h3>
+    <p>The <code>Ticks</code> property is <a href="https://learn.microsoft.com/en-us/dotnet/api/system.datetime.ticks?view=net-8.0#remarks">not
+            agnostic of time zones/kind</a>:</p>
+    <pre>
+@{
+    DateTime utc = DateTime.UtcNow;
+    DateTime local = utc.ToLocalTime(); // don't do this
+    DateTime unspecified = TimeZoneInfo.ConvertTime(utc, tz);
+}
+DateTime utc = DateTime.UtcNow;
+DateTime local = utc.ToLocalTime(); // don't do this
+DateTime unspecified = TimeZoneInfo.ConvertTime(utc, tz);
+
+// utc.Ticks         --> @utc.Ticks.ToString().FillMicroseconds(FakeMicroseconds)
+// local.Ticks       --> @local.Ticks.ToString().FillMicroseconds(FakeMicroseconds)
+// unspecified.Ticks --> @unspecified.Ticks.ToString().FillMicroseconds(FakeMicroseconds)
+    </pre>
+    <p>I guess it makes sense that <code>Ticks</code> would vary here, but I personally would have <em>guessed</em> that it was
+        always in UTC, sort of like <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime">Javascript's
+            <code>getTime</code></a>.</p>
+    <p>And <code>DateTimeOffset</code> works in the same spirit by factoring in the offset:</p>
+    <pre>
+// these are the same for DateTimeOffset, but not DateTime
+// dto.Ticks        --> @dto.Ticks.ToString().FillMicroseconds(FakeMicroseconds)
+// chicagoDto.Ticks --> @chicagoDto.Ticks.ToString().FillMicroseconds(FakeMicroseconds)
+//
+// and the difference is the same as the time zone offset ✔️:
+// (chicagoDto.Ticks - dto.Ticks) / TimeSpan.TicksPerHour --> @((chicagoDto.Ticks - dto.Ticks) / TimeSpan.TicksPerHour)
+    </pre>
 </article>
+
 
 @code {
     string? SelectedCultureName { get; set; }
@@ -898,16 +982,17 @@
 
     TimeZoneInfo? SelectedTimeZone;
     string? SelectedTimeZoneId { get; set; }
-    private TimeZoneInfo ApplySelectedTimeZone()
+    private void ApplySelectedTimeZone()
     {
         if (!TimeZoneInfo.TryFindSystemTimeZoneById(SelectedTimeZoneId ?? "America/New_York", out SelectedTimeZone))
             SelectedTimeZone = TimeZoneInfo.FindSystemTimeZoneById("America/New_York");
-
-        return SelectedTimeZone;
     }
 
+    DateTime WhenUtc;
     DateTime When;
-    
+    DateTimeOffset WhenOffset;
+    string FakeMicroseconds = "0000";
+
     System.Threading.Timer? timer;
 
     protected override async Task OnInitializedAsync()
@@ -916,8 +1001,24 @@
         ApplySelectedCulture();
 
         SelectedTimeZoneId = await TimeZoneProvider.DetectTimeZoneId();
-        var tz = ApplySelectedTimeZone();
-        When = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+        ApplySelectedTimeZone();
+        Tick();
+    }
+
+    protected void Tick()
+    {
+        if (SelectedTimeZone is not null)
+        {
+
+            WhenOffset = DateTimeOffset.UtcNow.ToOffset(SelectedTimeZone.BaseUtcOffset);
+
+            WhenUtc = WhenOffset.UtcDateTime;
+            When = TimeZoneInfo.ConvertTime(WhenUtc, SelectedTimeZone);
+
+            // when wasm renders a date, it has no precision beyond milliseconds so the tostring shows
+            // all zeros. We make up our own so the output can be formatted to appear correct
+            FakeMicroseconds = Random.Shared.Next(0, 9999).ToString("D4");
+        }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -930,7 +1031,7 @@
         {
             if (SelectedTimeZone is not null)
             {
-                When = TimeZoneInfo.ConvertTime(DateTime.UtcNow, SelectedTimeZone);
+                Tick();
                 InvokeAsync(() => StateHasChanged());
             }
         }, null, 0, 100);
