@@ -853,7 +853,7 @@
             </tr>
         </table>
 
-        <h3>time zone<a @onclick='() => NavigationProvider.Jump("footnote-1")' href="#footnote-1"><sup id="headnote-1">1</sup></a></h3>
+        <h3>time zone<a @onclick:preventDefault="true" @onclick='() => NavigationProvider.Jump("footnote-1")' href="#footnote-1"><sup id="headnote-1">1</sup></a></h3>
         <table>
             <tr>
                 <th><a href="http://msdn.microsoft.com/en-us/library/8kb3ddd4.aspx#KSpecifier">%K</a></th>
@@ -921,7 +921,7 @@ sfLocal.ToString("o") -> @sfLocal.ToString("o").FillMicroseconds(FakeMicrosecond
     <p>The time is correct, but the time zone offset <em>is not</em>. Chicago is @tz.GetUtcOffset(dt).ToString("\\-hh\\:mm"), not
         @sfLocal.ToString("zzz"). "Local" in this context is the <em>server's</em> time zone
         (@TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).ToString("\\-hh\\:mm")).</p>
-    <p><a @onclick='() => NavigationProvider.Jump("headnote-1")' href="#headnote-1"><sup id="footnote-1">1</sup></a>That undesired time zone also shows up in the related format strings <code>%K</code>, <code>%z</code>,
+    <p><a @onclick:preventDefault="true" @onclick='() => NavigationProvider.Jump("headnote-1")' href="#headnote-1"><sup id="footnote-1">1</sup></a>That undesired time zone also shows up in the related format strings <code>%K</code>, <code>%z</code>,
         <code>zz</code>, and <code>zzz</code> above. Again, these show the time zone of the server, not the time
         zone the value was converted to. Luckily, <code>DateTimeOffset</code> handles this better:</p>
     <pre>
