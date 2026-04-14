@@ -1,19 +1,22 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-RUN dotnet workload install wasm-tools
-RUN apt-get update && apt-get install -y python3
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build-env
+
+RUN apk add --no-cache python3 && dotnet workload install wasm-tools
 
 WORKDIR /App
+
+# Copy project files and restore as a separate layer for caching
 COPY Web.sln .
-COPY Web Web
-COPY Web.Client Web.Client
+COPY Web/Web.csproj Web/
+COPY Web.Client/Web.Client.csproj Web.Client/
+RUN dotnet restore Web/Web.csproj
 
-WORKDIR /App/Web
-RUN dotnet publish -c Release -o /out
+COPY Web/ Web/
+COPY Web.Client/ Web.Client/
+RUN dotnet publish Web/Web.csproj -c Release -o /out --no-restore
 
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy-chiseled-extra
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-chiseled-extra
 ENV DOTNET_URLS=http://*:80
 WORKDIR /var/www/web
 COPY --from=build-env /out .
-ENTRYPOINT [ "dotnet", "Web.dll" ]
+ENTRYPOINT ["dotnet", "Web.dll"]
 EXPOSE 80
