@@ -1,9 +1,4 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-env
-RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 \
- && ln -sf /usr/bin/python3 /usr/bin/python \
- && rm -rf /var/lib/apt/lists/* \
- && dotnet workload install wasm-tools
 
 WORKDIR /App
 
